@@ -94,3 +94,47 @@ types or fields with `Opportunity` / `StudentProfile`, so they were left out rat
 force-fit in. If that team-builder feature is actually meant to be part of Oppniva, it would
 make sense as its own future module (e.g. `app/api/teams/*`) rather than folded into the
 opportunity/pathway data — happy to build that out as a follow-up if you confirm it belongs here.
+
+---
+
+## Deploying to Vercel (recommended)
+
+Follow these steps to deploy Oppniva to Vercel so collaborators and judges can access the live demo.
+
+1) Connect the repo
+- Go to https://vercel.com and log in.
+- Click "Import Project" → select the GitHub repo `sreeja148/oppniva`.
+
+2) Build settings
+- Framework: Next.js (auto-detected)
+- Install Command: `pnpm install`
+- Build Command: `pnpm build && npx prisma generate`
+- Output Directory: default (Next.js)
+
+3) Environment variables (Vercel Project Settings)
+- `DATABASE_URL` — production Postgres/Neon/Railway URL (optional for demo; leave empty to use in-memory seed DB)
+- `SESSION_SECRET` — secure random string
+- `NEXT_PUBLIC_SITE_URL` — e.g. `https://your-app.vercel.app`
+- `GEMINI_API_KEY` — optional (for real AI recommendations)
+
+4) Run migrations
+- After the first deploy, run:
+```
+npx prisma migrate deploy --schema=prisma/schema.prisma
+```
+Or rely on the GitHub Action `.github/workflows/prisma_migrate.yml` (ensure `DATABASE_URL` is set in repo secrets).
+
+5) Quick deploy via CLI (optional)
+- Install and log in:
+```
+npm i -g vercel
+vercel login
+```
+- Deploy:
+```
+vercel --prod
+```
+
+6) Verify
+- Open your deployed URL, register/login with demo creds (`demo+judge@example.com` / `password123`), and exercise the main flows (save opportunity, get recommendations).
+- To run automated checks, update `scripts/e2e_flow.ps1` endpoints to the deployed URL and run it.
