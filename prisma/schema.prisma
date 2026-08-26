@@ -1,0 +1,85 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                String                 @id @default(cuid())
+  email             String                 @unique
+  passwordHash      String
+  growthPoints      Int                    @default(0)
+  createdAt         DateTime               @default(now())
+  profile           StudentProfile?
+  opportunityStates UserOpportunityState[]
+  pathwayStages     UserPathwayStage[]
+}
+
+model StudentProfile {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  city         String
+  school       String
+  study        String
+  interests    String   // JSON string of array
+  skills       String   // JSON string of array
+  goal         String
+  availability String   // JSON string of array
+}
+
+model Opportunity {
+  id              String                 @id
+  title           String
+  organization    String
+  category        String
+  format          String
+  location        String
+  date            String
+  deadline        String
+  icon            String
+  accent          String
+  description     String
+  longDescription String
+  tags            String                 // JSON string of array
+  eligibility     String                 // JSON string of array
+  userId          String?                // User-specific AI recommendation if set
+  defaultMatch    Int                    @default(60)
+  defaultWhyMatch String                 @default("[]") // JSON string of array
+  defaultBenefits String                 @default("[]") // JSON string of array
+  states          UserOpportunityState[]
+}
+
+model UserOpportunityState {
+  userId        String
+  opportunityId String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  saved         Boolean     @default(false)
+  status        String?     // 'interested' | 'preparing' | 'applied' | 'completed'
+  match         Int         @default(60)
+  whyMatch      String      @default("[]")
+  benefits      String      @default("[]")
+
+  @@id([userId, opportunityId])
+}
+
+model UserPathwayStage {
+  id          String @id @default(cuid())
+  userId      String
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stageId     Int    // 1, 2, 3, 4
+  status      String // 'done' | 'current' | 'next' | 'locked'
+  icon        String
+  title       String
+  label       String
+  description String
+  task        String
+  xp          String
+
+  @@unique([userId, stageId])
+}
