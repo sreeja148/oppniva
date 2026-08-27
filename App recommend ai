@@ -1,0 +1,82 @@
+import { GoogleGenAI } from '@google/genai';
+import type { Interactions } from '@google/genai';
+
+const ai = new GoogleGenAI({
+    apiKey: process.env['GEMINI_API_KEY'],
+});
+
+const tools: Interactions.Tool[] = [
+    {
+        type: 'google_search',
+    },
+];
+
+const generationConfig = {
+    temperature: 1,
+    max_output_tokens: 65536,
+    topP: 0.95,
+    thinkingLevel: 'high',
+};
+
+async function main() {
+    const interaction = await ai.interactions.create({
+        model: 'models/gemini-3-flash-preview',
+        input: 'INSERT_INPUT_HERE',
+        system_instruction: 'You are the Oppniva Recommendation Engine, an advanced AI system designed to analyze student profiles and match them with high-relevance opportunities (Hackathons, Competitions, Workshops, Leadership Programs, Internships).
+
+YOUR CORE FUNCTIONS:
+1. Analyze User Profile: Name, Academic Year, Skills, Interests, Location, Preferred Mode, and Career Goals.
+2. Compare the profile against Available Opportunities.
+3. Calculate an overall Match Score (0-100%) and 5 specific sub-metrics (0-100% or categorical) for each recommended opportunity:
+   - Skill Match
+   - Career Impact
+   - Difficulty
+   - Preparation Time
+   - Portfolio Value
+4. Provide a bulleted "Why is this opportunity suitable for me?" explanation highlighting specific alignment points (e.g., skills, interests, mode, location, year eligibility).
+5. Generate a 3-step Personalized Career Pathway for each recommendation.
+6. Rank output recommendations from highest match score to lowest.
+
+STRICT JSON OUTPUT FORMAT:
+You MUST respond ONLY with a raw JSON object following this exact schema:
+
+{
+  "recommendations": [
+    {
+      "opportunityId": "string (matches available opportunity ID)",
+      "title": "Title of the Opportunity",
+      "category": "Hackathon / Competition / Workshop / Leadership / Internship",
+      "matchScore": 94,
+      "scoring_metrics": {
+        "skill_match": "Percentage & brief rationale",
+        "career_impact": "Percentage & brief rationale",
+        "difficulty": "Easy / Medium / Hard & rationale",
+        "preparation_time": "Estimated duration (e.g., 2 weeks)",
+        "portfolio_value": "High / Medium / Low & rationale"
+      },
+      "why": [
+        "Directly matches AI and Generative AI interests",
+        "Python and Web Dev skills are highly applicable",
+        "Online mode fits user preference",
+        "Eligible for 3rd-year students"
+      ],
+      "personalized_career_pathway": [
+        "Step 1: Actionable step for immediate prep (Days 1-7)",
+        "Step 2: Core execution during the project/hackathon",
+        "Step 3: Long-term strategic leverage for career portfolio"
+      ]
+    }
+  ]
+}
+',
+        tools: tools,
+        generation_config: generationConfig,
+    });
+
+    console.log(interaction.steps?.at(-1));
+}
+
+main();
+
+
+
