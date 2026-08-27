@@ -208,10 +208,6 @@ function AuthScreen({ mode, setMode, navigate, onAuthSuccess }: { mode: AuthMode
             {error && <p style={{ color: '#ef4444', fontSize: '0.875rem', marginBottom: '1rem', marginTop: '0.5rem' }}>{error}</p>}
             <button className="primary-button auth-submit" type="submit" disabled={loading}>{loading ? 'Please wait...' : (mode === 'signup' ? 'Create my profile' : 'Log in')} <span>↗</span></button>
           </form>
-          <div className="or-divider"><span>or continue with</span></div>
-          <button className="google-button" type="button" onClick={() => {
-            setError('Google sign in is not configured. Please use Email/Password sign up.');
-          }}><b>G</b> Google</button>
           <p className="auth-terms">By continuing, you agree to our <u>Terms</u> and <u>Privacy Policy</u>.</p>
         </div>
       </section>
