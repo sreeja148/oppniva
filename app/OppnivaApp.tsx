@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import { categories, Opportunity, PathwayStage } from './data';
 import { backend, StudentProfile } from './backend';
 
@@ -143,6 +144,7 @@ function Landing({ navigate, setAuthMode, opportunities }: { navigate: (screen: 
 function AuthScreen({ mode, setMode, navigate, onAuthSuccess }: { mode: AuthMode; setMode: (mode: AuthMode) => void; navigate: (screen: Screen) => void; onAuthSuccess: (profile: ProfileDraft | null, defaultName: string) => void }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -203,7 +205,7 @@ function AuthScreen({ mode, setMode, navigate, onAuthSuccess }: { mode: AuthMode
           <form onSubmit={submit}>
             {mode === 'signup' && <label>Full name<input required name="name" placeholder="What should we call you?" /></label>}
             <label>Email address<input required type="email" name="email" placeholder="you@example.com" /></label>
-            <label>Password<div className="password-field"><input required minLength={6} type="password" name="password" placeholder="At least 6 characters" /><span>◉</span></div></label>
+            <label>Password<div className="password-field relative"><input className="pr-10" required minLength={6} type={showPassword ? "text" : "password"} name="password" placeholder="At least 6 characters" /><button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-3 top-1/2 -translate-y-1/2">{showPassword ? <EyeOff size={20} /> : <Eye size={20} />}</button></div></label>
             {mode === 'login' && <button className="forgot-button" type="button">Forgot password?</button>}
             {error && <p style={{ color: '#ef4444', fontSize: '0.875rem', marginBottom: '1rem', marginTop: '0.5rem' }}>{error}</p>}
             <button className="primary-button auth-submit" type="submit" disabled={loading}>{loading ? 'Please wait...' : (mode === 'signup' ? 'Create my profile' : 'Log in')} <span>↗</span></button>
